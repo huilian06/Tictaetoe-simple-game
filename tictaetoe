@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Sansita+Swashed:wght@500&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+	<title>Tictactoe Game</title>
+	<style type="text/css">
+		[v-cloak] {
+			display: none;
+		}
+
+		td{
+			background: #DDD;
+			width: 100px;
+			height: 100px;
+		}
+
+		.piece-o{
+		    margin: auto;
+		    width: 30px;
+		    height: 30px;
+		    border: 3px solid #ff8080;
+		    border-radius: 50%;
+		}
+
+		.piece-x{
+		    margin: auto;
+		    width: 30px;
+		    height: 30px;
+			background: linear-gradient(45deg, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 43%,#0099ff 45%,#0099ff 55%,rgba(0,0,0,0) 57%,rgba(0,0,0,0) 100%), linear-gradient(135deg, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 43%,#0099ff 45%,#0099ff 55%,rgba(0,0,0,0) 57%,rgba(0,0,0,0) 100%);
+
+		}
+		html, body {
+		  height: 100%;
+		  margin: 0;
+		  background: blueviolet;
+		}
+		.boxTTT{
+			margin: auto;
+			  height: 100%;
+			text-align: center;
+    		padding: 1%;
+		}
+		.tableContent{
+			display: flex;
+			justify-content: center;
+		}
+		.restartbtn{
+			margin-top: 10px;
+		    height: 50px;
+		    width: 100px;
+		    border-radius: 10px;
+		    cursor: pointer;
+		}
+		.flex-container {
+	        display: flex;
+	        align-items: center; 
+	        width: 25%;
+	        justify-content: center;
+	        margin: auto;
+ 			margin-top: -30px;
+
+	     }
+      	.flex-container > h4 {
+        	width: 50%;
+        	font-family: 'Sansita Swashed', cursive;
+        	font-size:28px;
+        
+      	}
+      
+	</style>
+</head>
+<body>
+	<div id="app" v-cloak>
+	<div class="boxTTT" v-if="welcome">
+			<h1 style="color: #3C0562;font-family: 'ZCOOL XiaoWei', serif;font-size: 64px;">Select Mode</h1>
+			<div class="flex-container">
+				<h4 @click="modePlayer" style="cursor: pointer;">2 Players</h4>
+			</div>
+		</div>
+
+		<div class="boxTTT" v-if="mode1">
+	  <h1> Tic Tac Toe </h1>
+      
+		<p>Current Player: {{turn}}</p>
+		<h3>Score<h3>
+	<div class="flex-container">
+		<h4>Player O: {{score.O}}</h4>
+		<h4>Player X: {{score.X}}</h4>
+	</div>
+		<table class="tableContent">
+			<tr v-for="(row, rowKey, index) in game" :key="rowKey">
+				<td v-for="(col, colKey, index) in row" :key="colKey" @click="click(rowKey, colKey)">
+					<div v-if="col" :class="'piece-'+col.toLowerCase()"></div>
+				</td>
+			</tr>
+		</table>
+		<div class="text-center">
+			
+			<button class="restartbtn" @click="ResetGame">Restart</button>
+		</div>
+</div>
+     
+     
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script type="text/javascript">
+		var app = new Vue({
+			el: '#app',
+			data: {
+				turn: 'O',
+				game: [
+					['','',''],
+					['','',''],
+					['','','']
+				],
+				winner:'',
+				draw:false,
+				squar:0,
+				score:{
+					O:0,
+					X:0
+				},
+				mode1:false,
+				computer:false,
+				welcome:true
+			},
+		
+        	methods: {
+        		modePlayer(){
+        			this.welcome=false;
+        			this.mode1=true;
+        		},
+        		modeComputer(){
+        			this.welcome=false;
+        			this.mode1=true;
+        			this.computer=true;
+        		},
+				click(row, col){
+					if(this.game[row][col] != ''){
+						alert('Please select empty slot.')
+						return
+					}
+
+					this.game[row].splice(col, 1, this.turn);
+					this.calcResult()
+					this.getPossibleMoves()
+					this.squar+=1
+					console.log(this.squar)
+					
+
+				},
+				  getPossibleMoves() {
+  if (this.computer==true) {
+  	  let moves = [];
+    for (let i=0; i<3; i++) {
+      for (let j=0; j<3; j++) {
+        if (this.game[i][j] === '') {
+          moves.push({x: i, y: j});
+        }
+      }
+    }
+    return moves;
+  }
+  },
+				ResetGame(){
+					this.game = [
+								['', '', ''],
+								['', '', ''],
+								['', '', '']
+							];
+					this.turn = 'O' ;
+					this.squar = 0;
+					this.score={
+								O:0,
+								X:0
+				};
+				},
+				ResetSquar(){
+					this.game = [
+								['', '', ''],
+								['', '', ''],
+								['', '', '']
+							];
+					
+					this.squar = -1;
+				},
+
+				calcResult(){
+					var game = this.game;
+					var turn = this.turn;
+					var winner = this.winner;
+					// Vertical rows
+				    for (let i=0; i<3; i++) {
+				      if (game[0][i] === turn && game[1][i] === turn && game[2][i] === turn) {
+				      	winner=turn
+				    	console.log(winner)
+				    	alert('Player '+this.turn+' winner!')
+				      	if(winner=='O'){
+				      	 	this.turn='O'
+				       		this.score.O+=10
+				      	}
+				       	else{
+					       	this.turn='X'
+					       	this.score.X+=10
+				       }
+				       	console.log(this.score.O,this.score.X)
+				        this.ResetSquar()
+				      }
+				    }
+				     // Horizontal rows
+				    for (let i=0; i<3; i++) {
+				      if (game[i][0] === turn && game[i][1] === turn && game[i][2] === turn) {
+				      	winner=turn
+				    	console.log(winner)
+				    	alert('Player '+this.turn+' winner!')
+				      	if(winner=='O'){
+				      	 	this.turn='O'
+				       		this.score.O+=10
+				      	}
+				       	else{
+					       	this.turn='X'
+					       	this.score.X+=10
+				       }
+				       	console.log(this.score.O,this.score.X)
+				        this.ResetSquar()
+				      }
+				    }
+				    // Diagonals
+				    if (game[0][0] === turn && game[1][1] === turn && game[2][2] === turn) {
+				    	winner=turn
+				    	console.log(winner)
+				    	alert('Player '+this.turn+' winner!')
+				      	if(winner=='O'){
+				      	 	this.turn='O'
+				       		this.score.O+=10
+				      	}
+				       	else{
+					       	this.turn='X'
+					       	this.score.X+=10
+				       }
+				       	console.log(this.score.O,this.score.X)
+				        this.ResetSquar()
+				    }
+				    if (game[2][0] === turn && game[1][1] === turn && game[0][2] === turn) {
+				    	winner=turn
+				    	console.log(winner)
+				    	alert('Player '+this.turn+' winner!')
+				      	if(winner=='O'){
+				      	 	this.turn='O'
+				       		this.score.O+=10
+				      	}
+				       	else{
+					       	this.turn='X'
+					       	this.score.X+=10
+				       }
+				       	console.log(this.score.O,this.score.X)
+				        this.ResetSquar()
+				    }
+
+					// Next player turn
+					this.turn = this.turn == 'O' ? 'X' : 'O'
+					// Draw
+					var winner = this.winner;
+						if(this.squar==8 && winner==''){
+							alert('Draw!');
+							this.ResetSquar()
+
+						}
+				}
+			}//method
+			
+		}) 
+	</script>
+</body>
+</html>
